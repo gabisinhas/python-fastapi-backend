@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-fastapi-project"
+version = "0.1.0"
+description = "Back end built with Python Fast API"
+authors = [
+    { name = "Gabriela dos Santos", email = "gabisinhas@yahoo.com.br" }
+]
+license = { text = "MIT" }
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "uvicorn","python-dotenv",
+    "python-dotenv"
+]
