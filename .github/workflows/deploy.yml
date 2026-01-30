@@ -10,7 +10,6 @@ permissions:
 
 env:
   AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
   ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
   ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
@@ -27,31 +26,29 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions
+          role-to-assume: arn:aws:iam::989864147831:role/github-actions-ecs
           aws-region: ${{ env.AWS_REGION }}
           audience: sts.amazonaws.com
           output-env-credentials: true
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-
       - name: Ensure ECR repository exists
         run: |
-            aws ecr describe-repositories --repository-names $ECR_REPOSITORY || \
-            aws ecr create-repository --repository-name $ECR_REPOSITORY
-            
+          aws ecr describe-repositories --repository-names $ECR_REPOSITORY || \
+          aws ecr create-repository --repository-name $ECR_REPOSITORY
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build and push Docker image
         id: build
         run: |
-          IMAGE_URI=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${GITHUB_SHA}
-          echo "Building image $IMAGE_URI"
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${GITHUB_SHA}
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
           echo "image=$IMAGE_URI" >> $GITHUB_OUTPUT
 
       - name: Render ECS task definition
+        id: render-task
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ecs-task-def.json
@@ -63,4 +60,5 @@ jobs:
         with:
           cluster: ${{ env.ECS_CLUSTER }}
           service: ${{ env.ECS_SERVICE }}
+          task-definition: ${{ steps.render-task.outputs.task-definition }}
           wait-for-service-stability: true
