@@ -30,10 +30,9 @@ jobs:
             aws-region: ${{ env.AWS_REGION }}
             audience: sts.amazonaws.com
             output-env-credentials: true
-
-      - name: Login to ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-
       - name: Build and push Docker image
         id: build
         run: |
