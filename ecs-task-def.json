@@ -1,0 +1,36 @@
+{
+  "family": "fastapi-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::989864147831:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::989864147831:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "fastapi",
+      "image": "IMAGE_WILL_BE_REPLACED",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:989864147831:secret:fastapi/database-url"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/fastapi",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

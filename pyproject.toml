@@ -13,6 +13,5 @@ license = { text = "MIT" }
 dependencies = [
     "fastapi",
     "uvicorn[standard]",
-    "uvicorn","python-dotenv",
     "python-dotenv"
 ]

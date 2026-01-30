@@ -7,6 +7,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name
 
 app = FastAPI()
 
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 @app.get("/")
 def index():
     return {"message": "Access /docs for API documentation."}
